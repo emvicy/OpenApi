@@ -27,7 +27,7 @@ $aDataType = array(
 );
 
 // classes
-$aDataType['class'][] = array(
+$aDataType['class']['DTValidateRequestResponse'] = array(
     'name' => 'DTValidateRequestResponse',
     'file' => 'DTValidateRequestResponse.php',
     'namespace' => $sThisModuleNamespace,
@@ -56,7 +56,7 @@ $aDataType['class'][] = array(
     ),
 );
 
-$aDataType['class'][] = array(
+$aDataType['class']['DTValidateMessage'] = array(
     'name' => 'DTValidateMessage',
     'file' => 'DTValidateMessage.php',
     'namespace' => $sThisModuleNamespace,

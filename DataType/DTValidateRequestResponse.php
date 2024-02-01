@@ -1,17 +1,14 @@
 <?php
+# 2024-02-01 13:46:34
 
-/**
- * @name $OpenApiDataType
- */
-namespace OpenApi\DataType;
-
+use MVC\DataType\DTValue;
 use MVC\MVCTrait\TraitDataType;
 
 class DTValidateRequestResponse
 {
 	use TraitDataType;
 
-	const DTHASH = '654f645128c58e61fd44b7f9c3009755';
+	public const DTHASH = '654f645128c58e61fd44b7f9c3009755';
 
 	/**
 	 * @required true
@@ -38,11 +35,13 @@ class DTValidateRequestResponse
 	 */
 	public function __construct(array $aData = array())
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.__construct.before', \MVC\DataType\DTArrayObject::create($aData)->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
+		$oDTValue = DTValue::create()->set_mValue($aData);
+		\MVC\Event::run('DTValidateRequestResponse.__construct.before', $oDTValue);
+		$aData = $oDTValue->get_mValue();
 
 		$this->bSuccess = false;
 		$this->aMessage = array();
-		$this->aValidationResult = array();
+		$this->aValidationResult = null;
 
 		foreach ($aData as $sKey => $mValue)
 		{
@@ -54,7 +53,7 @@ class DTValidateRequestResponse
 			}
 		}
 
-		\MVC\Event::RUN ('DTValidateRequestResponse.__construct.after', \MVC\DataType\DTArrayObject::create($aData));
+		$oDTValue = DTValue::create()->set_mValue($aData); \MVC\Event::run('DTValidateRequestResponse.__construct.after', $oDTValue);
 	}
 
     /**
@@ -64,51 +63,49 @@ class DTValidateRequestResponse
      */
     public static function create(array $aData = array())
     {
-        \MVC\Event::RUN ('DTValidateRequestResponse.create.before', \MVC\DataType\DTArrayObject::create($aData)->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
-        
-        $oObject = new self($aData);
+        $oDTValue = DTValue::create()->set_mValue($aData);
+		\MVC\Event::run('DTValidateRequestResponse.create.before', $oDTValue);
+		$oObject = new self($oDTValue->get_mValue());
+        $oDTValue = DTValue::create()->set_mValue($oObject); \MVC\Event::run('DTValidateRequestResponse.create.after', $oDTValue);
 
-        \MVC\Event::RUN ('DTValidateRequestResponse.create.after', \MVC\DataType\DTArrayObject::create()->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('DTValidateRequestResponse')->set_sValue($oObject)));
-        
-        return $oObject;
+        return $oDTValue->get_mValue();
     }
 
 	/**
-	 * @param bool $aValue 
+	 * @param bool $mValue 
 	 * @return $this
 	 * @throws \ReflectionException
 	 */
-	public function set_bSuccess($aValue)
+	public function set_bSuccess(bool $mValue)
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.set_bSuccess.before', \MVC\DataType\DTArrayObject::create(array('bSuccess' => $aValue))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
-
-		$this->bSuccess = (bool) $aValue;
+		$oDTValue = DTValue::create()->set_mValue($mValue); 
+		\MVC\Event::run('DTValidateRequestResponse.set_bSuccess.before', $oDTValue);
+		$this->bSuccess = (bool) $oDTValue->get_mValue();
 
 		return $this;
 	}
 
 	/**
-	 * @param DTValidateMessage[]  $aValue 
+	 * @param DTValidateMessage[]  $mValue 
 	 * @return $this
 	 * @throws \ReflectionException
 	 */
-	public function set_aMessage($aValue)
+	public function set_aMessage(array $mValue)
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.set_aMessage.before', \MVC\DataType\DTArrayObject::create(array('aMessage' => $aValue))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
+		$oDTValue = DTValue::create()->set_mValue($mValue); 
+		\MVC\Event::run('DTValidateRequestResponse.set_aMessage.before', $oDTValue);
 
-		$aValue = (array) $aValue;
+		$mValue = (array) $oDTValue->get_mValue();
                 
-        foreach ($aValue as $mKey => $aData)
-        {
-            $aData = (array) $aData; 
-            
+        foreach ($mValue as $mKey => $aData)
+        {            
             if (false === ($aData instanceof DTValidateMessage))
             {
-                $aValue[$mKey] = new DTValidateMessage($aData);
+                $mValue[$mKey] = new DTValidateMessage($aData);
             }
         }
 
-		$this->aMessage = $aValue;
+		$this->aMessage = $mValue;
 
 		return $this;
 	}
@@ -125,15 +122,15 @@ class DTValidateRequestResponse
 	}
 
 	/**
-	 * @param array $aValue 
+	 * @param array $mValue 
 	 * @return $this
 	 * @throws \ReflectionException
 	 */
-	public function set_aValidationResult($aValue)
+	public function set_aValidationResult(array $mValue)
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.set_aValidationResult.before', \MVC\DataType\DTArrayObject::create(array('aValidationResult' => $aValue))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
-
-		$this->aValidationResult = (array) $aValue;
+		$oDTValue = DTValue::create()->set_mValue($mValue); 
+		\MVC\Event::run('DTValidateRequestResponse.set_aValidationResult.before', $oDTValue);
+		$this->aValidationResult = (array) $oDTValue->get_mValue();
 
 		return $this;
 	}
@@ -142,11 +139,12 @@ class DTValidateRequestResponse
 	 * @return bool
 	 * @throws \ReflectionException
 	 */
-	public function get_bSuccess()
+	public function get_bSuccess() : bool
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.get_bSuccess.before', \MVC\DataType\DTArrayObject::create()->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('bSuccess')->set_sValue($this->bSuccess))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
+		$oDTValue = DTValue::create()->set_mValue($this->bSuccess); 
+		\MVC\Event::run('DTValidateRequestResponse.get_bSuccess.before', $oDTValue);
 
-		return $this->bSuccess;
+		return $oDTValue->get_mValue();
 	}
 
 	/**
@@ -155,20 +153,22 @@ class DTValidateRequestResponse
 	 */
 	public function get_aMessage()
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.get_aMessage.before', \MVC\DataType\DTArrayObject::create()->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aMessage')->set_sValue($this->aMessage))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
+		$oDTValue = DTValue::create()->set_mValue($this->aMessage); 
+		\MVC\Event::run('DTValidateRequestResponse.get_aMessage.before', $oDTValue);
 
-		return $this->aMessage;
+		return $oDTValue->get_mValue();
 	}
 
 	/**
 	 * @return array
 	 * @throws \ReflectionException
 	 */
-	public function get_aValidationResult()
+	public function get_aValidationResult() : array
 	{
-		\MVC\Event::RUN ('DTValidateRequestResponse.get_aValidationResult.before', \MVC\DataType\DTArrayObject::create()->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aValidationResult')->set_sValue($this->aValidationResult))->add_aKeyValue(\MVC\DataType\DTKeyValue::create()->set_sKey('aBacktrace')->set_sValue(\MVC\Debug::prepareBacktraceArray(debug_backtrace()))));
+		$oDTValue = DTValue::create()->set_mValue($this->aValidationResult); 
+		\MVC\Event::run('DTValidateRequestResponse.get_aValidationResult.before', $oDTValue);
 
-		return $this->aValidationResult;
+		return $oDTValue->get_mValue();
 	}
 
 	/**
@@ -208,7 +208,7 @@ class DTValidateRequestResponse
 	 */
 	public function getPropertyJson()
 	{
-        return json_encode($this->getPropertyArray());
+        return json_encode(\MVC\Convert::objectToArray($this));
 	}
 
 	/**
@@ -236,7 +236,7 @@ class DTValidateRequestResponse
 	 */
 	public function flushProperties()
 	{
-		foreach ($this->getPropertyArray() as $sKey => $aValue)
+		foreach ($this->getPropertyArray() as $sKey => $mValue)
 		{
 			$sMethod = 'set_' . $sKey;
 

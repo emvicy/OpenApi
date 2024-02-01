@@ -72,6 +72,17 @@ _All Routes lead explicitely to `Api::delegate()`_
 );
 ~~~
 
+**DTClassesOnOpenapi3yaml**  
+
+~~~php
+\OpenApi\Model\Generate::DTClassesOnOpenapi3yaml(
+    '/absolute/path/to/file/openapi.yaml',  # openapi yaml file | openapi yaml URL 
+    'DTOpenapi',                            # Foldername; where to store DTClasses
+    true,                                   # remove and create Folder for new; true|false
+    false                                   # take values from "example" as default values
+); 
+~~~
+
 ---
 
 ## Get Logs

@@ -1,5 +1,5 @@
 <?php
-# 2024-02-01 13:46:34
+# 2024-02-01 13:58:56
 
 use MVC\DataType\DTValue;
 use MVC\MVCTrait\TraitDataType;

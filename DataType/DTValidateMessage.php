@@ -1,5 +1,10 @@
 <?php
-# 2024-02-01 13:58:56
+# 2024-02-03 17:32:15
+
+/**
+ * @name $OpenApiDataType
+ */
+namespace OpenApi\DataType;
 
 use MVC\DataType\DTValue;
 use MVC\MVCTrait\TraitDataType;

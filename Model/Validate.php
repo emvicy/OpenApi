@@ -221,10 +221,10 @@ class Validate
     }
 
     /**
-     * @param DTValidateRequestResponse $oDTValidateRequestResponse
-     * @param string $sYamlSource
-     * @param string $sMessage
-     * @return DTValidateRequestResponse
+     * @param \OpenApi\DataType\DTValidateRequestResponse $oDTValidateRequestResponse
+     * @param string                                      $sYamlSource
+     * @param string                                      $sMessage
+     * @return \OpenApi\DataType\DTValidateRequestResponse
      * @throws \ReflectionException
      */
     protected static function sYamlSourceFail(DTValidateRequestResponse $oDTValidateRequestResponse, string $sYamlSource = '', string $sMessage = '')

@@ -44,7 +44,7 @@ class Generate
         $aSchema = self::getAllSchemas($aYaml);
 
         // for openapi version 3 only
-        if (3 !== (int) get($aYaml['openapi']))
+        if (3 !== (int) ($aYaml['openapi'] ?? null))
         {
             return false;
         }
@@ -66,7 +66,7 @@ class Generate
         foreach ($aSchema as $sName => $aValue)
         {
             // skip non objects
-            if ('object' !== get($aValue['type']))
+            if ('object' !== ($aValue['type'] ?? null))
             {
                 continue;
             }
@@ -80,12 +80,13 @@ class Generate
                 'constant' => array(),
             );
 
-            $aProperty = get($aValue['properties'], array());
+            $aProperty = ($aValue['properties'] ?? array());
 
             // iterate property array
             foreach ($aProperty as $sPropertyName => $aPropertySpecs)
             {
                 $mVar = self::getSchemaItemPropertyType($aPropertySpecs);
+                $bNullable = (boolean) ($aPropertySpecs['nullable'] ?? false);
 
                 $mValue = (true === $bValueFromExample)
                     ? self::getSchemaItemPropertyValue($aPropertySpecs)
@@ -101,21 +102,21 @@ class Generate
             }
 
                 TYPE_OBJECT: {
-                $sRef = get($aPropertySpecs['$ref']);
+                $sRef = ($aPropertySpecs['$ref'] ?? null);
 
                 // var is type $ref; check type of ref
                 if (null !== $sRef)
                 {
                     $sNameOfRef = current(array_reverse(explode('/', $sRef)));
 
-                    if ('object' === get($aSchema[$sNameOfRef]['type']))
+                    if ('object' === ($aSchema[$sNameOfRef]['type']) ?? null)
                     {
                         $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef;
                         $mValue = "$mVar::create()";
                     }
-                    elseif ('array' === get($aSchema[$sNameOfRef]['type']))
+                    elseif ('array' === ($aSchema[$sNameOfRef]['type'] ?? null))
                     {
-                        $sSubItemsRef = current(array_reverse(explode('/', get($aSchema[$sNameOfRef]['items']['$ref']))));
+                        $sSubItemsRef = current(array_reverse(explode('/', ($aSchema[$sNameOfRef]['items']['$ref'] ?? null))));
                         $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sSubItemsRef . '[]';
                         $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
                     }
@@ -123,7 +124,7 @@ class Generate
             }
 
                 TYPE_ARRAY_OF_OBJECT: {
-                $sItemsRef = get($aPropertySpecs['items']['$ref']);
+                $sItemsRef = ($aPropertySpecs['items']['$ref'] ?? null);
 
                 // var is array of type $ref
                 if ($mVar === 'array' && null !== $sItemsRef)
@@ -144,6 +145,7 @@ class Generate
 
                 $aDataType['class'][$sName]['property'][$sPropertyName]['key'] = $sPropertyName;
                 $aDataType['class'][$sName]['property'][$sPropertyName]['var'] = $mVar;
+                $aDataType['class'][$sName]['property'][$sPropertyName]['nullable'] = $bNullable;
                 $aDataType['class'][$sName]['property'][$sPropertyName]['value'] = $mValue;
                 $aDataType['class'][$sName]['property'][$sPropertyName]['required'] = true;
                 $aDataType['class'][$sName]['property'][$sPropertyName]['forceCasting'] = true;
@@ -198,7 +200,7 @@ class Generate
      */
     public static function getAllSchemas(array $aYaml = array())
     {
-        $aSchema = get($aYaml['components']['schemas'], array());
+        $aSchema = ($aYaml['components']['schemas'] ?? array());
 
         return $aSchema;
     }
@@ -209,7 +211,7 @@ class Generate
      */
     protected static function getSchemaItemPropertyValue(array $aPropertySpecs = array())
     {
-        $mValue = get($aPropertySpecs['example']);
+        $mValue = ($aPropertySpecs['example'] ?? null);
         $mVar = self::getSchemaItemPropertyType($aPropertySpecs);
 
         if (gettype($mValue) != gettype($mVar))
@@ -226,7 +228,7 @@ class Generate
      */
     protected static function getSchemaItemPropertyType(array $aPropertySpecs = array())
     {
-        $mVar = get($aPropertySpecs['type']);
+        $mVar = ($aPropertySpecs['type'] ?? null);
         ('boolean' === $mVar) ? $mVar = 'bool' : false;
         ('integer' === $mVar) ? $mVar = 'int' : false;
         ('number' === $mVar) ? $mVar = 'float' : false;

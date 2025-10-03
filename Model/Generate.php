@@ -2,6 +2,7 @@
 
 namespace OpenApi\Model;
 
+use Emvicy\Emvicy;
 use MVC\Cache;
 use MVC\Config;
 use MVC\File;
@@ -10,19 +11,15 @@ use MVC\Strings;
 class Generate
 {
     /**
-     * @example
-     * Generate::DTClassesOnOpenapi3yaml(
-     *      'https://api.example.com/api/openapi.yaml',
-     *      'API'
-     * );
-     * @param string $sOpenApiFile required
-     * @param string $sSubDirName required
-     * @param bool $bUnlinkDir
-     * @param bool $bValueFromExample
-     * @return void
+     * @param      $sOpenApiFile
+     * @param      $sSubDirName
+     * @param      $bUnlinkDir
+     * @param      $bValueFromExample
+     * @param bool $bDebug
+     * @return bool
      * @throws \ReflectionException
      */
-    public static function DTClassesOnOpenapi3yaml($sOpenApiFile = '', $sSubDirName = '', $bUnlinkDir = true, $bValueFromExample = true)
+    public static function DTClassesOnOpenapi3yaml($sOpenApiFile = '', $sSubDirName = '', $bUnlinkDir = true, $bValueFromExample = true, bool $bDebug = false)
     {
         if (true === empty($sOpenApiFile) || true === empty($sSubDirName))
         {
@@ -43,10 +40,22 @@ class Generate
         // get schema
         $aSchema = self::getAllSchemas($aYaml);
 
+        // skip on empty
+        if (true === empty($aSchema))
+        {
+            return false;
+        }
+
         // for openapi version 3 only
         if (3 !== (int) ($aYaml['openapi'] ?? null))
         {
             return false;
+        }
+
+        if (true === $bDebug)
+        {
+            dump(str_repeat('-', 80));
+            dump("URL: " . $sOpenApiFile);
         }
 
         // create namespace string
@@ -71,6 +80,11 @@ class Generate
                 continue;
             }
 
+            if (true === $bDebug)
+            {
+                dump("Class: " . $sNamespace . '\\' . $sName);
+            }
+
             // class
             $aDataType['class'][$sName] = array(
                 'name' => $sName,
@@ -87,61 +101,66 @@ class Generate
             {
                 $mVar = self::getSchemaItemPropertyType($aPropertySpecs);
                 $bNullable = (boolean) ($aPropertySpecs['nullable'] ?? false);
-
                 $mValue = (true === $bValueFromExample)
                     ? self::getSchemaItemPropertyValue($aPropertySpecs)
                     : null;
 
-                TYPE_STANDARD: {
-
-                ('string' === strtolower($mVar)) ? $mValue = '' : false;
-                ('int' === strtolower($mVar)) ? $mValue = 0 : false;
-                ('float' === strtolower($mVar)) ? $mValue = 0.0 : false;
-                ('bool' === strtolower($mVar)) ? $mValue = false : false;
-                ('array' === strtolower($mVar)) ? $mValue = 'array()' : false;
-            }
-
-                TYPE_OBJECT: {
-                $sRef = ($aPropertySpecs['$ref'] ?? null);
-
-                // var is type $ref; check type of ref
-                if (null !== $sRef)
+                if (true === isset($mVar))
                 {
-                    $sNameOfRef = current(array_reverse(explode('/', $sRef)));
+                    /*
+                     * TYPE_STANDARD
+                     */
+                    ('string' === strtolower($mVar)) ? $mValue = '' : false;
+                    ('int' === strtolower($mVar)) ? $mValue = 0 : false;
+                    ('float' === strtolower($mVar)) ? $mValue = 0.0 : false;
+                    ('bool' === strtolower($mVar)) ? $mValue = false : false;
+                    ('array' === strtolower($mVar)) ? $mValue = 'array()' : false;
 
-                    if ('object' === ($aSchema[$sNameOfRef]['type']) ?? null)
+                    /*
+                     * TYPE_OBJECT
+                     */
+                    $sRef = ($aPropertySpecs['$ref'] ?? null);
+
+                    // var is type $ref; check type of ref
+                    if (null !== $sRef)
                     {
-                        $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef;
-                        $mValue = "$mVar::create()";
+                        $sNameOfRef = current(array_reverse(explode('/', $sRef)));
+
+                        if ('object' === ($aSchema[$sNameOfRef]['type']) ?? null)
+                        {
+                            $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef;
+                            $mValue = "$mVar::create()";
+                        }
+                        elseif ('array' === ($aSchema[$sNameOfRef]['type'] ?? null))
+                        {
+                            $sSubItemsRef = current(array_reverse(explode('/', ($aSchema[$sNameOfRef]['items']['$ref'] ?? null))));
+                            $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sSubItemsRef . '[]';
+                            $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
+                        }
                     }
-                    elseif ('array' === ($aSchema[$sNameOfRef]['type'] ?? null))
+
+                    /*
+                     * TYPE_ARRAY_OF_OBJECT
+                     */
+                    $sItemsRef = ($aPropertySpecs['items']['$ref'] ?? null);
+
+                    // var is array of type $ref
+                    if ($mVar === 'array' && null !== $sItemsRef)
                     {
-                        $sSubItemsRef = current(array_reverse(explode('/', ($aSchema[$sNameOfRef]['items']['$ref'] ?? null))));
-                        $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sSubItemsRef . '[]';
+                        $sNameOfRef = current(array_reverse(explode('/', $sItemsRef)));
+                        $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '[]';
                         $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
                     }
                 }
-            }
 
-                TYPE_ARRAY_OF_OBJECT: {
-                $sItemsRef = ($aPropertySpecs['items']['$ref'] ?? null);
-
-                // var is array of type $ref
-                if ($mVar === 'array' && null !== $sItemsRef)
-                {
-                    $sNameOfRef = current(array_reverse(explode('/', $sItemsRef)));
-                    $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '[]';
-                    $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
-                }
-            }
-
-                TYPE_UNSPECIFIC: {
+                /*
+                 * TYPE_UNSPECIFIC
+                 */
                 if (true === self::getItemsOfRef($aPropertySpecs))
                 {
                     $mVar = 'null';
                     $mValue = 'null';
                 }
-            }
 
                 $aDataType['class'][$sName]['property'][$sPropertyName]['key'] = $sPropertyName;
                 $aDataType['class'][$sName]['property'][$sPropertyName]['var'] = $mVar;

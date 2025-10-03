@@ -25,14 +25,14 @@ class Route
         );
 
         // read PATHs from openapi
-        $aRawPath = get($aOpenApiReader['raw']['paths'], array());
+        $aRawPath = ($aOpenApiReader['raw']['paths'] ?? array());
 
         // finally: dynamically create routes from openapi
         foreach ($aRawPath as $sPath => $aPath)
         {
             foreach ($aPath as $sRouteMethod => $aSpec)
             {
-                $sTmp = (get($aSpec['operationId'], ''));
+                $sTmp = (($aSpec['operationId'] ?? ''));
                 $sOperationId = (true === is_array($sTmp)) ? current($sTmp) : $sTmp;
 
                 if (true === empty($sClassMethod) && true === empty($sOperationId))

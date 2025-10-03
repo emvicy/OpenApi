@@ -263,7 +263,7 @@ class PsrRequest implements ServerRequestInterface
      */
     public function getAttribute($sAttributeName, $sAttributeDefaultValue = null)
     {
-        return get($this->getAttributes()[$sAttributeName], $sAttributeDefaultValue);
+        return ($this->getAttributes()[$sAttributeName] ?? $sAttributeDefaultValue);
     }
 
     /**

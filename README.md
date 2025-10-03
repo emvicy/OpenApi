@@ -21,7 +21,9 @@ git clone --branch 3.x https://github.com/emvicy/OpenApi.git OpenApi;
 
 ## Usage
 
-_validate against openapi **file**_
+### Validating 
+
+_validate against an openapi **file**_  
 ~~~php
 use OpenApi\Model\Validate;
 
@@ -34,7 +36,7 @@ header('Content-Type: application/json');
 echo json_encode(Convert::objectToArray($oDTValidateRequestResponse));
 ~~~
 
-_validate against openapi **URL**_
+_validate against an openapi **URL**_
 ~~~php
 use OpenApi\Model\Validate;
 
@@ -48,7 +50,9 @@ header('Content-Type: application/json');
 echo json_encode(Convert::objectToArray($oDTValidateRequestResponse));
 ~~~
 
-**auto-creating Emvicy Routes from openapi file**
+---
+
+### Auto-creating Emvicy Routes from openapi file
 
 _All Routes lead to their given `operationId`, set in openapi_    
 ~~~php
@@ -67,15 +71,49 @@ _All Routes lead explicitely to `Api::delegate()`_
 );
 ~~~
 
-**DTClassesOnOpenapi3yaml**  
+---
+
+### Auto-creating local DataType Classes from within Yaml Files or URLs
+
+Create a **configuration** according to the following scheme; it contains the Yaml files or URLs to be processed.
+
+_Example Configuration for several YAML File locations (`Foo` here is the primary Module)_    
+~~~php
+$aConfig['MODULE']['Foo']['service'] = [
+    'Bar' => [ // Service Name
+        'aOpenApi' => [
+            'sLocation' => 'https://bar.example.com/path/to/openapi.yaml', // a remote yaml address
+        ],
+    ],
+    'Baz' => [ // Service Name
+        'aOpenApi' => [
+            'sLocation' => '/absolute/path/to/openapi.yaml', // a local yaml address
+        ],
+    ],
+];
+~~~
+
+You can then run the **cli command** to generate local DataType Classes according to the yaml files.
+
+~~~bash
+php emvicy openapi:datatype
+~~~
+
+---
+
+**DTClassesOnOpenapi3yaml**
+
+otherwise you can call the Generator explicitely.
 
 ~~~php
+// generate from any accessible yaml location
 \OpenApi\Model\Generate::DTClassesOnOpenapi3yaml(
-    '/absolute/path/to/file/openapi.yaml',  # openapi yaml file | openapi yaml URL 
-    'DTOpenapi',                            # Foldername; where to store DTClasses
-    true,                                   # remove and create Folder for new; true|false
-    false                                   # take values from "example" as default values
-); 
+    sOpenApiFile: '/absolute/path/to/openapi.yaml', # openapi yaml file|URL
+    sSubDirName: 'DTOpenapi',                       # Storing Classes in `/modules/{primary}/DataType/DTOpenapi`
+    bUnlinkDir: true,                               # remove and create Folder for new; true|false
+    bValueFromExample: false,                       # take values from "example" as default values
+    bDebug: true                                    # print debug infos
+);
 ~~~
 
 ---

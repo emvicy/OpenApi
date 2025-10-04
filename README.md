@@ -82,12 +82,16 @@ _Example Configuration for several YAML File locations (`Foo` here is the primar
 $aConfig['MODULE']['Foo']['service'] = [
     'Bar' => [ // Service Name
         'aOpenApi' => [
-            'sLocation' => 'https://bar.example.com/path/to/openapi.yaml', // a remote yaml address
+            'aLocation' => [
+                'https://bar.example.com/path/to/openapi.yaml', // a remote yaml address
+            ],
         ],
     ],
     'Baz' => [ // Service Name
         'aOpenApi' => [
-            'sLocation' => '/absolute/path/to/openapi.yaml', // a local yaml address
+            'aLocation' => [
+                '/absolute/path/to/openapi.yaml', // a local yaml address
+            ],
         ],
     ],
 ];
@@ -110,7 +114,7 @@ otherwise you can call the Generator explicitely.
 \OpenApi\Model\Generate::DTClassesOnOpenapi3yaml(
     sOpenApiFile: '/absolute/path/to/openapi.yaml', # openapi yaml file|URL
     sSubDirName: 'DTOpenapi',                       # Storing Classes in `/modules/{primary}/DataType/DTOpenapi`
-    bUnlinkDir: true,                               # remove and create Folder for new; true|false
+    bUnlinkDir: false,                              # remove and create Folder for new; true|false
     bValueFromExample: false,                       # take values from "example" as default values
     bDebug: true                                    # print debug infos
 );

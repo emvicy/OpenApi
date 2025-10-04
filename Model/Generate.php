@@ -21,7 +21,21 @@ class Generate
      */
     public static function DTClassesOnOpenapi3yaml($sOpenApiFile = '', $sSubDirName = '', $bUnlinkDir = true, $bValueFromExample = true, bool $bDebug = false)
     {
-        if (true === empty($sOpenApiFile) || true === empty($sSubDirName))
+        $bAvailable = true;
+
+        // url
+        if (filter_var($sOpenApiFile, FILTER_VALIDATE_URL))
+        {
+            $mHeader = @get_headers($sOpenApiFile);
+            $bAvailable = (boolean) strpos(($mHeader[0] ?? ''), '200');
+        }
+        // file
+        elseif (false === file_exists($sOpenApiFile))
+        {
+            $bAvailable = false;
+        }
+
+        if (true === empty($sOpenApiFile) || true === empty($sSubDirName) || false === $bAvailable)
         {
             return false;
         }
@@ -126,16 +140,19 @@ class Generate
                     {
                         $sNameOfRef = current(array_reverse(explode('/', $sRef)));
 
-                        if ('object' === ($aSchema[$sNameOfRef]['type']) ?? null)
+                        if (true === isset($aSchema[$sNameOfRef]))
                         {
-                            $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef;
-                            $mValue = "$mVar::create()";
-                        }
-                        elseif ('array' === ($aSchema[$sNameOfRef]['type'] ?? null))
-                        {
-                            $sSubItemsRef = current(array_reverse(explode('/', ($aSchema[$sNameOfRef]['items']['$ref'] ?? null))));
-                            $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sSubItemsRef . '[]';
-                            $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
+                            if ('object' === ($aSchema[$sNameOfRef]['type']) ?? null)
+                            {
+                                $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef;
+                                $mValue = "$mVar::create()";
+                            }
+                            elseif ('array' === ($aSchema[$sNameOfRef]['type'] ?? null))
+                            {
+                                $sSubItemsRef = current(array_reverse(explode('/', ($aSchema[$sNameOfRef]['items']['$ref'] ?? null))));
+                                $mVar = '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sSubItemsRef . '[]';
+                                $mValue = '$this->add_' . $sPropertyName . '(' . '\\' . $aDataType['class'][$sName]['namespace'] . '\\' . $sNameOfRef . '::create());';
+                            }
                         }
                     }
 

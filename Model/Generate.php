@@ -27,7 +27,7 @@ class Generate
         if (filter_var($sOpenApiFile, FILTER_VALIDATE_URL))
         {
             $mHeader = @get_headers($sOpenApiFile);
-            $bAvailable = (boolean) strpos(($mHeader[0] ?? ''), '200');
+            $bAvailable = (bool) strpos(($mHeader[0] ?? ''), '200');
         }
         // file
         elseif (false === file_exists($sOpenApiFile))
@@ -82,7 +82,7 @@ class Generate
         // base setup
         $aDataType = array(
             'dir' => $sDir,
-            'unlinkDir' => (boolean) $bUnlinkDir
+            'unlinkDir' => (bool) $bUnlinkDir
         );
 
         // iterate schema and create classes
@@ -114,7 +114,7 @@ class Generate
             foreach ($aProperty as $sPropertyName => $aPropertySpecs)
             {
                 $mVar = self::getSchemaItemPropertyType($aPropertySpecs);
-                $bNullable = (boolean) ($aPropertySpecs['nullable'] ?? false);
+                $bNullable = (bool) ($aPropertySpecs['nullable'] ?? false);
                 $mValue = (true === $bValueFromExample)
                     ? self::getSchemaItemPropertyValue($aPropertySpecs)
                     : null;

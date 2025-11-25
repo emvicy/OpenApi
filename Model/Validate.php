@@ -53,7 +53,7 @@ class Validate
         }
 
         // $sYamlSource is URL: download and save to cache
-        if (true === (boolean)filter_var($sYamlSource, FILTER_VALIDATE_URL))
+        if (true === (bool)filter_var($sYamlSource, FILTER_VALIDATE_URL))
         {
             $sYamlSource = self::saveAsFile($sYamlSource);
         }
@@ -94,7 +94,7 @@ class Validate
                 $sExpectedType = $oRequestBody->getContent()->type;
 
                 // check content type "json"
-                if (true === (boolean)stristr($sExpectedType, 'json') && false === Strings::isJson($oDTRequestIn->get_input()))
+                if (true === (bool)stristr($sExpectedType, 'json') && false === Strings::isJson($oDTRequestIn->get_input()))
                 {
                     $sMessage = 'content type has to be valid `' . $sExpectedType . '`';
                     Error::error(json_last_error_msg() . ' on RequestBody of ' . $oDTRequestIn->get_path() . ': ' . $sMessage);

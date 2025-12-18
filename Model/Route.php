@@ -41,9 +41,20 @@ class Route
                     return false;
                 }
 
+                // operationId contains a custom 'class::method' (e.g. '\Module\Controller\Whatever::any')
+                if (stristr($sOperationId, '::'))
+                {
+                    $sControllerClassMethod = $sOperationId;
+                }
+                // default: \Foo\Controller\Api::method
+                else
+                {
+                    $sControllerClassMethod = $sClass . '::' . ((false === empty($sClassMethod)) ? $sClassMethod : $sOperationId);
+                }
+
                 \MVC\Route::$sRouteMethod(
-                    $sPath,
-                    $sClass . '::' . ((false === empty($sClassMethod)) ? $sClassMethod : $sOperationId)
+                    sPath: $sPath,
+                    sClassMethod: $sControllerClassMethod
                 );
             }
         }

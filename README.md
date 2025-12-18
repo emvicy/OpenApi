@@ -54,15 +54,18 @@ echo json_encode(Convert::objectToArray($oDTValidateRequestResponse));
 
 ### Auto-creating Emvicy Routes from openapi file
 
-_All Routes lead to their given `operationId`, set in openapi_    
+_All Routes lead to their given `operationId`, set in openapi_      
 ~~~php
 \OpenApi\Model\Route::autoCreateFromOpenApiFile(
     Config::get_MVC_PUBLIC_PATH() . '/openapi/api.yaml',
+    // default Controller
     '\Foo\Controller\Api'
 );
 ~~~
+- if `operationId` in yaml file declaration contains a `Class::method` that will be used as target
 
-_All Routes lead explicitely to `Api::delegate()`_      
+
+_All Routes lead explicitely to `Api::delegate()`_        
 ~~~php
 \OpenApi\Model\Route::autoCreateFromOpenApiFile(
     Config::get_MVC_PUBLIC_PATH() . '/openapi/api.yaml',
